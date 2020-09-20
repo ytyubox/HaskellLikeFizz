@@ -32,6 +32,21 @@ final class HaskellLikeFizzTests: XCTestCase {
         XCTAssertEqual(list2array(map({$0 * $0})(range(1)(10))), (1...10).map{$0 * $0})
         XCTAssertEqual(list2array(map({$0.description})(range(1)(10))), (1...10).map{$0.description})
     }
+    func test_fizzbuzz() {
+        XCTAssertEqual(fizzbuzz(1), "1")
+        
+        XCTAssertEqual(fizzbuzz(3), "fizz")
+        XCTAssertEqual(fizzbuzz(5), "buzz")
+        XCTAssertEqual(fizzbuzz(15), "fizzbuzz")
+        let result = list2array(map(fizzbuzz(_:))(range(1)(20)))
+        let expect = [
+            "1", "2", "fizz", "4", "buzz",
+            "fizz", "7","8", "fizz","buzz",
+            "11", "fizz", "13", "14", "fizzbuzz",
+            "16", "17", "fizz", "19", "buzz"
+        ]
+        XCTAssertEqual(result, expect)
+    }
     static var allTests = [
         ("testadd", testadd),
         ("test_pair_head_tail",test_pair_head_tail),
@@ -40,27 +55,32 @@ final class HaskellLikeFizzTests: XCTestCase {
     ]
 }
 
-struct HaskellAdd {
-    internal init(_ a: Int) {
+struct HaskellAdd
+{
+    internal init(_ a: Int)
+    {
         self.a = a
     }
     
     private let a:Int
-    func callAsFunction(_ b: Int) -> Int {
+    func callAsFunction(_ b: Int) -> Int
+    {
         a + b
     }
 }
 
 func pair<T>(_ first:T) -> (list<T>?) -> list<T>
 {
-    {
+    { [first] in
         list(first,
              $0)
     }
 }
 
-func range(_ low: Int) -> (Int) -> list<Int>? {
-    { (high: Int)  in
+func range(_ low: Int) -> (Int) -> list<Int>?
+{
+    {
+        [low] (high: Int)  in
         low > high
             ? nil
             : pair(low)(range(low+1)(high))
@@ -76,7 +96,7 @@ func tail<T>(_ list: list<T>?) -> list<T>?
 }
 func map<T,U>(_ f:@escaping (T)->U) -> ((list<T>?) -> (list<U>?))
 {
-    { (xs:list?) -> list<U>? in
+    {  [f] (xs:list?) -> list<U>? in
         xs == nil
             ? nil
             : pair(f(head(xs!)))(map(f)(tail(xs)))
@@ -89,13 +109,13 @@ struct list<T:Equatable>: Equatable {
     private final class Wrapper {
         let first:T
         let second:Wrapper?
-
+        
         init(_ value: T, second:Wrapper?) {
-         self.first = value
+            self.first = value
             self.second = second
             
-       }
-     }
+        }
+    }
     
     static func == (lhs: list, rhs: list) -> Bool {
         lhs.first == rhs.first && lhs.second == rhs.second
@@ -123,7 +143,7 @@ extension list: ExpressibleByIntegerLiteral where T == Int{
     init(integerLiteral value: Int) {
         self.init(value, nil)
     }
-
+    
 }
 
 func list2array<T>(_ xs:list<T>?) -> [T] {
@@ -142,4 +162,24 @@ func array2list<T>(_ list: [T]) -> list<T>? {
         result = pair(i)(result)
     }
     return result
+}
+
+func fizzbuzz(_ n: Int) -> String? {
+    ifEmpty((n.isMultiple(of: 3) ? "fizz" : "")
+              +
+              (n.isMultiple(of: 5) ? "buzz": ""))(
+        n.description)
+}
+
+func ifEmpty<T:Collection>(_ c: T) -> (T.Element...) -> [T.Element] {
+    { [c] in
+        c.isEmpty ? Array(c) : $0
+    }
+}
+
+func ifEmpty(_ c: String) -> (String) -> String {
+    { [c] in
+        c.isEmpty ? $0 : c
+        
+    }
 }

@@ -8,9 +8,12 @@ final class HaskellLikeFizzTests: XCTestCase {
     }
     func testPair() {
         XCTAssertEqual(head(pair(10)(20)), 10)
-        XCTAssertEqual(tail(pair(10)(20)), 20)
+        XCTAssertEqual(tail(pair(10)(20)), pair(20)(nil))
         XCTAssertEqual(head(pair(10)(nil)), 10)
         XCTAssertEqual(tail(pair(10)(nil)), nil)
+        XCTAssertEqual(
+            list2array(pair(3)(pair(2)(pair(1)(nil)))),
+            [3,2,1])
     }
     
     static var allTests = [
@@ -28,27 +31,56 @@ struct HaskellAdd {
         a + b
     }
 }
-func pair(_ first:Int) -> (Int?) -> list {
+func pair(_ first:Int) -> (Int) -> list {
     return {
-        list(first, $0)
+        list(first,
+             $0 == nil
+              ? nil
+              : list($0!, nil))
     }
 }
+func pair(_ first:Int) -> (list?) -> list {
+    return {
+        list(first,
+             $0)
+    }
+}
+
 func head(_ list: list) -> Int {
     list.first
 }
-func tail(_ list: list) -> Int? {
-    list.second
+func tail(_ list: list?) -> list? {
+    list?.second
 }
-struct list {
+class list: Equatable, ExpressibleByIntegerLiteral {
+    required init(integerLiteral value: Int) {
+        self.first = value
+        self.second = nil
+    }
+  
+    
+    static func == (lhs: list, rhs: list) -> Bool {
+        lhs.first == rhs.first && lhs.second == rhs.second
+    }
+    
     internal init(
         _ first: Int,
-        _ second: Int?) {
+        _ second: list?) {
         self.first = first
         self.second = second
     }
     
     let first:Int
-    let second:Int?
+    let second:list?
 }
 
 
+func list2array(_ xs:list?) -> [Int] {
+    var xs = xs
+    var result = [Int]()
+    while xs != nil {
+        result.append(head(xs!))
+        xs = tail(xs)
+    }
+    return result
+}

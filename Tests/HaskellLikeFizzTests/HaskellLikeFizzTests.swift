@@ -22,7 +22,12 @@ final class HaskellLikeFizzTests: XCTestCase {
         let result = array2list([1,2,3])
         XCTAssertEqual(expect, result)
     }
-    
+    func test_range() {
+        let expect = (1...10).map{$0}
+        let result = list2array(range(1)(10))
+        XCTAssertEqual(expect, result)
+    }
+
     static var allTests = [
         ("testadd", testadd),
         ("test_pair_head_tail",test_pair_head_tail),
@@ -42,17 +47,27 @@ struct HaskellAdd {
     }
 }
 
-func pair(_ first:Int) -> (list?) -> list {
-    return {
+func pair(_ first:Int) -> (list?) -> list
+{
+    {
         list(first,
              $0)
     }
 }
 
-func head(_ list: list) -> Int {
+func range(_ low: Int) -> (Int) -> list? {
+    { (high: Int)  in
+        low > high
+            ? nil
+            : pair(low)(range(low+1)(high))
+    }
+}
+func head(_ list: list) -> Int
+{
     list.first
 }
-func tail(_ list: list?) -> list? {
+func tail(_ list: list?) -> list?
+{
     list?.second
 }
 class list: Equatable, ExpressibleByIntegerLiteral {

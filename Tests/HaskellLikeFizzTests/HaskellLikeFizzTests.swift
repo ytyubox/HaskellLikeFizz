@@ -30,6 +30,7 @@ final class HaskellLikeFizzTests: XCTestCase {
     }
     func test_map() {
         XCTAssertEqual(list2array(map({$0 * $0})(range(1)(10))), (1...10).map{$0 * $0})
+        XCTAssertEqual(list2array(map({$0.description})(range(1)(10))), (1...10).map{$0.description})
     }
     static var allTests = [
         ("testadd", testadd),

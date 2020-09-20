@@ -15,7 +15,8 @@ final class HaskellLikeFizzTests: XCTestCase {
     func test_list2array() {
         XCTAssertEqual(
             list2array(pair(3)(pair(2)(pair(1)(nil)))),
-            [3,2,1])
+            [3,2,1]
+        )
     }
     func test_array2list() {
         let expect = pair(1)(pair(2)(pair(3)(nil)))
@@ -27,7 +28,9 @@ final class HaskellLikeFizzTests: XCTestCase {
         let result = list2array(range(1)(10))
         XCTAssertEqual(expect, result)
     }
-
+    func test_map() {
+        XCTAssertEqual(list2array(map({$0 * $0})(range(1)(10))), (1...10).map{$0 * $0})
+    }
     static var allTests = [
         ("testadd", testadd),
         ("test_pair_head_tail",test_pair_head_tail),
@@ -69,6 +72,14 @@ func head(_ list: list) -> Int
 func tail(_ list: list?) -> list?
 {
     list?.second
+}
+func map(_ f:@escaping (Int)->Int) -> ((list?) -> (list?))
+{
+    { (xs:list?) -> list? in
+        xs == nil
+            ? nil
+            : pair(f(head(xs!)))(map(f)(tail(xs)))
+    }
 }
 class list: Equatable, ExpressibleByIntegerLiteral {
     required init(integerLiteral value: Int) {

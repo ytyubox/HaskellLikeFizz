@@ -1,10 +1,13 @@
 # HaskellLikeFizz
 
-Swift implement of Haskell Fizz buzz from youtube
+Swift implement of Haskell Fizz buzz from youtube: [Haskell for JavaScript programmers - YouTube](https://www.youtube.com/watch?v=pUN3algpvMs&ab_channel=Tsoding)
 
 [![](https://i.ytimg.com/an_webp/pUN3algpvMs/mqdefault_6s.webp?du=3000&sqp=CIbPnfsF&rs=AOn4CLC-kuhM93zT3e45m4Y9IKh9gq7Yaw)](https://www.youtube.com/watch?v=pUN3algpvMs&ab_channel=Tsoding)
 
 ## Principles
+
+> Pure functional programming is about composing pure functions.
+
 1. No Loops
 2. No ifs 
 3. Function is Single Return

@@ -7,10 +7,10 @@ final class HaskellLikeFizzTests: XCTestCase {
         XCTAssertEqual(3, result)
     }
     func testPair() {
-        XCTAssertEqual(fst(pair(10)(20)), 10)
-        XCTAssertEqual(snd(pair(10)(20)), 20)
-        XCTAssertEqual(fst(pair(10)(nil)), 10)
-        XCTAssertEqual(snd(pair(10)(nil)), nil)
+        XCTAssertEqual(head(pair(10)(20)), 10)
+        XCTAssertEqual(tail(pair(10)(20)), 20)
+        XCTAssertEqual(head(pair(10)(nil)), 10)
+        XCTAssertEqual(tail(pair(10)(nil)), nil)
     }
     
     static var allTests = [
@@ -33,10 +33,10 @@ func pair(_ first:Int) -> (Int?) -> list {
         list(first, $0)
     }
 }
-func fst(_ list: list) -> Int {
+func head(_ list: list) -> Int {
     list.first
 }
-func snd(_ list: list) -> Int? {
+func tail(_ list: list) -> Int? {
     list.second
 }
 struct list {

@@ -50,7 +50,7 @@ struct HaskellAdd {
     }
 }
 
-func pair(_ first:Int) -> (list?) -> list
+func pair<T>(_ first:T) -> (list<T>?) -> list<T>
 {
     {
         list(first,
@@ -58,55 +58,76 @@ func pair(_ first:Int) -> (list?) -> list
     }
 }
 
-func range(_ low: Int) -> (Int) -> list? {
+func range(_ low: Int) -> (Int) -> list<Int>? {
     { (high: Int)  in
         low > high
             ? nil
             : pair(low)(range(low+1)(high))
     }
 }
-func head(_ list: list) -> Int
+func head<T>(_ list: list<T>) -> T
 {
     list.first
 }
-func tail(_ list: list?) -> list?
+func tail<T>(_ list: list<T>?) -> list<T>?
 {
     list?.second
 }
-func map(_ f:@escaping (Int)->Int) -> ((list?) -> (list?))
+func map<T,U>(_ f:@escaping (T)->U) -> ((list<T>?) -> (list<U>?))
 {
-    { (xs:list?) -> list? in
+    { (xs:list?) -> list<U>? in
         xs == nil
             ? nil
             : pair(f(head(xs!)))(map(f)(tail(xs)))
     }
 }
-class list: Equatable, ExpressibleByIntegerLiteral {
-    required init(integerLiteral value: Int) {
-        self.first = value
-        self.second = nil
-    }
-    
+
+/// struct like list
+/// from class to struct by https://stackoverflow.com/a/40776684/10172299
+struct list<T:Equatable>: Equatable {
+    private final class Wrapper {
+        let first:T
+        let second:Wrapper?
+
+        init(_ value: T, second:Wrapper?) {
+         self.first = value
+            self.second = second
+            
+       }
+     }
     
     static func == (lhs: list, rhs: list) -> Bool {
         lhs.first == rhs.first && lhs.second == rhs.second
     }
     
     internal init(
-        _ first: Int,
+        _ first: T,
         _ second: list?) {
-        self.first = first
-        self.second = second
+        self.wrapper = Wrapper(first,second: second?.wrapper)
     }
-    
-    let first:Int
-    let second:list?
+    private init(
+        _ wrapper: Wrapper) {
+        self.wrapper = wrapper
+    }
+    private var wrapper: Wrapper
+    var first:T {
+        wrapper.first
+    }
+    var second: list<T>? {
+        guard let second = self.wrapper.second else {return nil}
+        return list(second)
+    }
+}
+extension list: ExpressibleByIntegerLiteral where T == Int{
+    init(integerLiteral value: Int) {
+        self.init(value, nil)
+    }
+
 }
 
-
-func list2array(_ xs:list?) -> [Int] {
+func list2array<T>(_ xs:list<T>?) -> [T] {
     var xs = xs
-    var result = [Int]()
+    var result = [T]()
     while xs != nil {
         result.append(head(xs!))
         xs = tail(xs)
@@ -114,8 +135,8 @@ func list2array(_ xs:list?) -> [Int] {
     return result
 }
 
-func array2list(_ list: [Int]) -> list? {
-    var result:list? = nil
+func array2list<T>(_ list: [T]) -> list<T>? {
+    var result:list<T>? = nil
     for i in list.reversed() {
         result = pair(i)(result)
     }

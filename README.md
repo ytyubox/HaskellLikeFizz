@@ -1,6 +1,6 @@
 # HaskellLikeFizz
 
-A description of this package.
+![[](https://www.youtube.com/watch?v=pUN3algpvMs&ab_channel=Tsoding)](https://www.youtube.com/watch?v=pUN3algpvMs&ab_channel=Tsoding)
 
 1. No Loops
 2. No ifs 
